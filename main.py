@@ -39,6 +39,18 @@ def main() -> int:
     # No trailing newline: the file holds exactly the one line.
     with open(path, "w", encoding="utf-8", newline="") as f:
         f.write(line)
+    # Verify the write: read the file back and confirm it is
+    # byte-for-byte the entry line, so a truncated or corrupted
+    # write is caught here instead of silently scoring 0.
+    with open(path, "rb") as f:
+        written = f.read().decode("utf-8")
+    if written != line:
+        print(
+            f"error: entry.txt does not match ENTRY_LINE "
+            f"({len(written)} bytes written, expected {len(line.encode('utf-8'))})",
+            file=sys.stderr,
+        )
+        return 1
     return 0
 
 
